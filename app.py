@@ -186,27 +186,44 @@ def update_user(user_id):
         return jsonify({'error': 'Unauthorized'}), 401
 
     data = request.get_json()
-    room_number = data.get('room_number')
-    phone = data.get('phone')
-    fullname = data.get('fullname')
-    note = data.get('note')
-    active = data.get('active')
 
     conn = get_db()
     cursor = conn.cursor()
 
+    # 1. เช็กก่อนว่ามีผู้ใช้จริงไหม
+    cursor.execute("SELECT user_id FROM users WHERE user_id = %s", (user_id,))
+    user = cursor.fetchone()
+
+    if not user:
+        cursor.close()
+        conn.close()
+        return jsonify({'success': False, 'message': 'ไม่พบผู้ใช้'}), 404
+
+    # 2. อัปเดตข้อมูล
     try:
         cursor.execute("""
             UPDATE users
-            SET room_number = %s, phone = %s, fullname = %s, note = %s, active = %s
+            SET room_number = %s,
+                phone = %s,
+                fullname = %s,
+                note = %s,
+                active = %s
             WHERE user_id = %s
-        """, (room_number, phone, fullname, note, active, user_id))
+        """, (
+            data.get('room_number'),
+            data.get('phone'),
+            data.get('fullname'),
+            data.get('note'),
+            data.get('active'),
+            user_id
+        ))
+
         conn.commit()
-        if cursor.rowcount == 0:
-            return jsonify({'success': False, 'message': 'ไม่พบผู้ใช้'}), 404
         return jsonify({'success': True, 'message': 'แก้ไขสำเร็จ'})
+
     except mysql.connector.IntegrityError:
         return jsonify({'success': False, 'message': 'เบอร์โทรนี้มีในระบบแล้ว'}), 400
+
     finally:
         cursor.close()
         conn.close()
