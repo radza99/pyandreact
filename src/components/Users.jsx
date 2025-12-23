@@ -16,6 +16,7 @@ export default function Users() {
     note: '', 
     active: 1
   });
+  
   const navigate = useNavigate();
 
   const fetchUsers = () => {
@@ -89,11 +90,12 @@ export default function Users() {
     <>
       <Navbar />
       <div className="container">
+        
         <h2>จัดการผู้ใช้</h2>
         <button 
           className="btn btn-primary" 
           onClick={() => setShowForm(true)} 
-          style={{marginBottom: '1.5rem', fontSize: '1.1rem', padding: '0.8rem 1.5rem'}}
+          style={{marginBottom: '1.5rem', fontSize: '1.1rem', padding: '0.8rem 1.5rem',marginTop:'1rem'}}
         >
           + เพิ่มผู้ใช้ใหม่
         </button>

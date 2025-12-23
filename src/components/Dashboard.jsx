@@ -5,12 +5,22 @@ import Navbar from './Navbar';
 
 export default function Dashboard() {
   const [stats, setStats] = useState({});
+  const [loading, setLoading] = useState(true);  // เพิ่ม loading state
   const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('/admin/dashboard')
-      .then(res => setStats(res.data))
-      .catch(() => navigate('/login'));
+      .then(res => {
+        setStats(res.data);
+      })
+      .catch(err => {
+        console.error('โหลด Dashboard ล้มเหลว:', err);
+        // ถ้า error 401 หรืออื่น ๆ ที่เกี่ยวกับ login → เด้งไป login
+        navigate('/login');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [navigate]);
 
   return (
